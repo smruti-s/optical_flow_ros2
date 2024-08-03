@@ -210,6 +210,7 @@ class OpticalFlowOpenCV:
                         ):
                             temp_flow_x_mean += temp_flow_x
                             temp_flow_y_mean += temp_flow_y
+                            meancount += 1
                         else:
                             i = 0
 
@@ -220,15 +221,6 @@ class OpticalFlowOpenCV:
 
         # remember features
         self.features_previous = self.features_current
-        points = self.features_current
-
-        # # update feature status
-        # for i in range(len(self.update_list)):
-        #     if self.update_list[i] == 2:
-        #         self.update_list[i] == 1
-
-        #     if self.update_list[i] == 0:
-        #         self.update_list[i] = 2
 
         # output
         flow_x = pixel_flow_x_mean
@@ -240,11 +232,12 @@ class OpticalFlowOpenCV:
             flow_y=flow_y,
             frame_time_us=img_time_us,
         )
-        # if flow_quality == -1:
-        # self.get_logger().warning("Flow quality indicates not ready for publishing")
+        
+        if flow_quality == -1:
+            self.get_logger().warning("Flow quality indicates not ready for publishing")
 
         # convert pixel flow to angular flow
         flow_x = math.atan2(flow_x, self.focal_length_x)
         flow_y = math.atan2(flow_y, self.focal_length_y)
 
-        return flow_x, flow_y, points, flow_quality, dt_us
+        return flow_x, flow_y, flow_quality, dt_us
